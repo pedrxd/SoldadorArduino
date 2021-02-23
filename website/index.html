@@ -1,0 +1,158 @@
+<!--
+  This file is part of SoldadorArduino.
+
+  SoldadorArduino is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  any later version.
+
+  SoldadorArduino is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with SoldadorArduino.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style media="screen">
+    body {
+      padding: 0;
+      margin: 0;
+      border: 0;
+    }
+
+    .config {
+      background-color: #034f84;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      color: white;
+    }
+
+    .config-contenedor {
+      margin: 20px;
+      padding-bottom: 20px;
+      border-style: dashed;
+      border-radius: 10px;
+      width: 400px;
+    }
+
+    .config-item {
+      text-align: center
+    }
+
+    .footer-options {
+      position: fixed;
+      display: flex;
+      width: 100%;
+      max-width: 600px;
+      justify-content: center;
+      bottom: 0px;
+    }
+
+    .footer-button {
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      width: 50%;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+    }
+
+    .footer-guardar {
+      background-color: #4CAF50;
+
+    }
+
+    .footer-reset {
+      background-color: #f44336;
+    }
+
+  </style>
+  <script>
+
+    function cambiarConfig(key, value)
+    {
+      var petition = new XMLHttpRequest();
+      petition.onreadystatechange = function() {
+        if (petition.readyState == 4 && petition.status == 200)
+          document.getElementById("footer").style.visibility = "visible";
+      }
+      petition.open("GET", window.location.origin + "/cambiarconfig?" + key + "=" + value, true); // true for asynchronous
+      petition.send(null);
+    }
+
+    function guardarConfig() {
+      var petition = new XMLHttpRequest();
+      petition.onreadystatechange = function() {
+        if (petition.readyState == 4 && petition.status == 200)
+          document.getElementById("footer").style.visibility = "hidden";
+      }
+      petition.open("GET", window.location.origin + "/guardar", true); // true for asynchronous
+      petition.send(null);
+    }
+
+    function resetConfig() {
+      var petition = new XMLHttpRequest();
+      petition.onreadystatechange = function() {
+        if (petition.readyState == 4 && petition.status == 200)
+        {
+          document.getElementById("footer").style.visibility = "hidden";
+          document.location.reload(true);
+        }
+      }
+      petition.open("GET", window.location.origin + "/reset", true); // true for asynchronous
+      petition.send(null);
+    }
+  </script>
+  <title>Configurador</title>
+</head>
+
+<body>
+  <h2>Configuracion</h2>
+  <div class="config">
+    <div class="config-contenedor">
+      <div class="config-item">
+        <h2>Tiempo de pulsación</h2>
+        <input type="number" id="dpulso" onchange="cambiarConfig('dpulso', this.value)"  value="%d">
+      </div>
+      <div class="config-item">
+        <h2>Tiempo entre pulsaciones</h2>
+        <input type="number" id="dintermedio"  onchange="cambiarConfig('dintermedio', this.value)"  value="%d">
+      </div>
+      <div class="config-item">
+        <h2>Modo</h2>
+        <input type="range" id="modo" min="0" max="1" step="1" onchange="cambiarConfig('modo', this.value)" value="%d">
+      </div>
+    </div>
+
+
+    <div class="config-contenedor">
+      <div class="config-item">
+        <h2>SSID</h2>
+        <input type="text" id="ssid" onchange="cambiarConfig('ssid', this.value)" value="%s">
+      </div>
+      <div class="config-item">
+        <h2>Password</h2>
+        <input type="text" id="password" onchange="cambiarConfig('password', this.value)" value="%s">
+      </div>
+    </div>
+
+    <div id="footer" class="footer-options" style="visibility: hidden;">
+      <button class="footer-button footer-guardar" type="button" onclick="guardarConfig()">Guardar</button>
+      <button class="footer-button footer-reset" type="button" onclick="resetConfig()">Reset</button>
+    </div>
+  </div>
+</body>
+
+</html>
