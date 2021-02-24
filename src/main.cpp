@@ -83,17 +83,17 @@ inline void comprobarInput()
 {
   input = !digitalRead(pinpulsacion);
 
-  if(input)
+  if(input!=pulsado && pulsadoHasta < millis())
   {
-    pulsado = true;
-    pulsadoHasta = millis() + 100;
-  }else
-  {
-    if(pulsadoHasta < millis())
+    if(input)
+    {
+      pulsado = true;
+    }else
     {
       pulsado = false;
       unicoUsado = false;
     }
+    pulsadoHasta = millis() + 200;
   }
 }
 
@@ -117,12 +117,12 @@ void loop() {
       while(pulsado)
       {
         yield();
-        comprobarInput();
         if(siguientePulso < millis())
         {
           darPunto();
           siguientePulso = millis() + config->getDuracionIntermedio();
         }
+        comprobarInput();
       }
     }
     else if(modo == MODO_SIMPLE)
