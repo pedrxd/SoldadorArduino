@@ -77,74 +77,37 @@
     .footer-reset {
       background-color: #f44336;
     }
-
   </style>
-  <script>
-
-    function cambiarConfig(key, value)
-    {
-      var petition = new XMLHttpRequest();
-      petition.onreadystatechange = function() {
-        if (petition.readyState == 4 && petition.status == 200)
-          document.getElementById("footer").style.visibility = "visible";
-      }
-      petition.open("GET", window.location.origin + "/cambiarconfig?" + key + "=" + value, true); // true for asynchronous
-      petition.send(null);
-    }
-
-    function guardarConfig() {
-      var petition = new XMLHttpRequest();
-      petition.onreadystatechange = function() {
-        if (petition.readyState == 4 && petition.status == 200)
-          document.getElementById("footer").style.visibility = "hidden";
-      }
-      petition.open("GET", window.location.origin + "/guardar", true); // true for asynchronous
-      petition.send(null);
-    }
-
-    function resetConfig() {
-      var petition = new XMLHttpRequest();
-      petition.onreadystatechange = function() {
-        if (petition.readyState == 4 && petition.status == 200)
-        {
-          document.getElementById("footer").style.visibility = "hidden";
-          document.location.reload(true);
-        }
-      }
-      petition.open("GET", window.location.origin + "/reset", true); // true for asynchronous
-      petition.send(null);
-    }
-  </script>
   <title>Configurador</title>
 </head>
 
 <body>
-  <h2>Configuracion</h2>
+  <h2 onmousedown="pulsar_titulo()" onmouseup="despulsar_titulo()">Configuracion: %s</h2>
   <div class="config">
-    <div class="config-contenedor">
-      <div class="config-item">
+    <div id="config-default" class="config-contenedor">
+      <div id="config-dpulso" class="config-item">
         <h2>Tiempo de pulsación</h2>
-        <input type="number" id="dpulso" onchange="cambiarConfig('dpulso', this.value)"  value="%d">
+        <input type="number" id="dpulso" onkeyup="cambiarConfig('dpulso', this.value)" value="%d">
       </div>
-      <div class="config-item">
+      <div id="config-dintermedio" class="config-item">
         <h2>Tiempo entre pulsaciones</h2>
-        <input type="number" id="dintermedio"  onchange="cambiarConfig('dintermedio', this.value)"  value="%d">
+        <input type="number" id="dintermedio" onkeyup="cambiarConfig('dintermedio', this.value)" value="%d">
       </div>
       <div class="config-item">
-        <h2>Modo</h2>
-        <input type="range" id="modo" min="0" max="1" step="1" onchange="cambiarConfig('modo', this.value)" value="%d">
+        <h2>Modo: <span id="modo-type"></span></h2>
+        <input type="range" id="modo" min="0" max="2" step="1" onchange="cambiarConfig('modo', this.value)" value="%d">
       </div>
     </div>
 
 
-    <div class="config-contenedor">
+    <div id="config-wifi" class="config-contenedor" style="visibility: hidden;">
       <div class="config-item">
         <h2>SSID</h2>
-        <input type="text" id="ssid" onchange="cambiarConfig('ssid', this.value)" value="%s">
+        <input type="text" id="ssid" onkeyup="cambiarConfig('ssid', this.value)" value="%s">
       </div>
       <div class="config-item">
         <h2>Password</h2>
-        <input type="text" id="password" onchange="cambiarConfig('password', this.value)" value="%s">
+        <input type="text" id="password" onkeyup="cambiarConfig('password', this.value)" value="%s">
       </div>
     </div>
 
@@ -154,5 +117,81 @@
     </div>
   </div>
 </body>
+
+<script>
+
+  var pressTimer;
+
+  function pulsar_titulo()
+  {
+    pressTimer = window.setTimeout(function() {
+      if(document.getElementById("config-wifi").style.visibility == "hidden")
+        document.getElementById("config-wifi").style.visibility = "visible";
+      else
+        document.getElementById("config-wifi").style.visibility = "hidden";
+    },1000);
+  };
+
+  function despulsar_titulo()
+  {
+    clearTimeout(pressTimer);
+  };
+
+
+  function cambiarModo(value) {
+    if (value === "0") {
+      document.getElementById("config-dpulso").style.visibility = "visible";
+      document.getElementById("config-dintermedio").style.visibility = "hidden";
+      document.getElementById("modo-type").innerHTML = "Unico";
+    } else if (value === "1") {
+      document.getElementById("config-dpulso").style.visibility = "visible";
+      document.getElementById("config-dintermedio").style.visibility = "visible";
+      document.getElementById("modo-type").innerHTML = "Multiple";
+    } else {
+      document.getElementById("config-dpulso").style.visibility = "hidden";
+      document.getElementById("config-dintermedio").style.visibility = "hidden";
+      document.getElementById("modo-type").innerHTML = "Continuo";
+    }
+  }
+
+  function cambiarConfig(key, value) {
+    //Si se cambia modo ocultar o no algunas opciones
+    if (key === "modo") {
+      cambiarModo(value);
+    }
+    var petition = new XMLHttpRequest();
+    petition.onreadystatechange = function() {
+      if (petition.readyState == 4 && petition.status == 200)
+        document.getElementById("footer").style.visibility = "visible";
+
+    }
+    petition.open("GET", window.location.origin + "/cambiarconfig?" + key + "=" + value, true); // true for asynchronous
+    petition.send(null);
+  }
+
+  function guardarConfig() {
+    var petition = new XMLHttpRequest();
+    petition.onreadystatechange = function() {
+      if (petition.readyState == 4 && petition.status == 200)
+        document.getElementById("footer").style.visibility = "hidden";
+    }
+    petition.open("GET", window.location.origin + "/guardar", true); // true for asynchronous
+    petition.send(null);
+  }
+
+  function resetConfig() {
+    var petition = new XMLHttpRequest();
+    petition.onreadystatechange = function() {
+      if (petition.readyState == 4 && petition.status == 200) {
+        document.getElementById("footer").style.visibility = "hidden";
+        document.location.reload(true);
+      }
+    }
+    petition.open("GET", window.location.origin + "/reset", true); // true for asynchronous
+    petition.send(null);
+  }
+  
+  cambiarModo(document.getElementById("modo").value);
+</script>
 
 </html>

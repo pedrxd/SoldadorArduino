@@ -132,6 +132,16 @@ void loop() {
         darPunto();
         unicoUsado = true;
       }
+    }else if(modo == MODO_CONTINUO)
+    {
+      if (pulsado) {
+        digitalWrite(pinrele, HIGH);
+        digitalWrite(pinled, HIGH);
+      }else
+      {
+        digitalWrite(pinrele, LOW);
+        digitalWrite(pinled, LOW);
+      }
     }
   }
 
