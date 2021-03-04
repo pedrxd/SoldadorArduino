@@ -37,8 +37,30 @@ public:
     if(url.equals("/"))
     {
       //The chain contains  a minimized version of website/index.html
-      response->printf("<!DOCTYPE html><html lang=\"es\" dir=\"ltr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><style media=\"screen\">body{padding:0;margin:0;border:0}.config{background-color:#034f84;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;color:white}.config-contenedor{margin:20px;padding-bottom:20px;border-style:dashed;border-radius:10px;width:400px}.config-item{text-align:center}.footer-options{position:fixed;display:flex;width:100%;max-width:600px;justify-content:center;bottom:0px}.footer-button{border:none;color:white;padding:15px 32px;width:50%;text-align:center;text-decoration:none;display:inline-block;font-size:16px}.footer-guardar{background-color:#4CAF50}.footer-reset{background-color:#f44336}</style><title>Configurador</title></head><body><h2 onmousedown=\"pulsar_titulo()\" onmouseup=\"despulsar_titulo()\">Configuracion: %s</h2><div class=\"config\"><div id=\"config-default\" class=\"config-contenedor\"><div id=\"config-dpulso\" class=\"config-item\"><h2>Tiempo de pulsación</h2> <input type=\"number\" id=\"dpulso\" onkeyup=\"cambiarConfig('dpulso', this.value)\" value=\"%d\"></div><div id=\"config-dintermedio\" class=\"config-item\"><h2>Tiempo entre pulsaciones</h2> <input type=\"number\" id=\"dintermedio\" onkeyup=\"cambiarConfig('dintermedio', this.value)\" value=\"%d\"></div><div class=\"config-item\"><h2>Modo: <span id=\"modo-type\"></span></h2> <input type=\"range\" id=\"modo\" min=\"0\" max=\"2\" step=\"1\" onchange=\"cambiarConfig('modo', this.value)\" value=\"%d\"></div></div><div id=\"config-wifi\" class=\"config-contenedor\" style=\"visibility: hidden;\"><div class=\"config-item\"><h2>SSID</h2> <input type=\"text\" id=\"ssid\" onkeyup=\"cambiarConfig('ssid', this.value)\" value=\"%s\"></div><div class=\"config-item\"><h2>Password</h2> <input type=\"text\" id=\"password\" onkeyup=\"cambiarConfig('password', this.value)\" value=\"%s\"></div></div><div id=\"footer\" class=\"footer-options\" style=\"visibility: hidden;\"> <button class=\"footer-button footer-guardar\" type=\"button\" onclick=\"guardarConfig()\">Guardar</button> <button class=\"footer-button footer-reset\" type=\"button\" onclick=\"resetConfig()\">Reset</button></div></div></body> <script>var pressTimer;function pulsar_titulo(){pressTimer=window.setTimeout(function(){\"hidden\"==document.getElementById(\"config-wifi\").style.visibility?document.getElementById(\"config-wifi\").style.visibility=\"visible\":document.getElementById(\"config-wifi\").style.visibility=\"hidden\"},1e3)}function despulsar_titulo(){clearTimeout(pressTimer)}function cambiarModo(e){\"0\"===e?(document.getElementById(\"config-dpulso\").style.visibility=\"visible\",document.getElementById(\"config-dintermedio\").style.visibility=\"hidden\",document.getElementById(\"modo-type\").innerHTML=\"Unico\"):\"1\"===e?(document.getElementById(\"config-dpulso\").style.visibility=\"visible\",document.getElementById(\"config-dintermedio\").style.visibility=\"visible\",document.getElementById(\"modo-type\").innerHTML=\"Multiple\"):(document.getElementById(\"config-dpulso\").style.visibility=\"hidden\",document.getElementById(\"config-dintermedio\").style.visibility=\"hidden\",document.getElementById(\"modo-type\").innerHTML=\"Continuo\")}function cambiarConfig(e,t){\"modo\"===e&&cambiarModo(t);var i=new XMLHttpRequest;i.onreadystatechange=function(){4==i.readyState&&200==i.status&&(document.getElementById(\"footer\").style.visibility=\"visible\")},i.open(\"GET\",window.location.origin+\"/cambiarconfig?\"+e+\"=\"+t,!0),i.send(null)}function guardarConfig(){var e=new XMLHttpRequest;e.onreadystatechange=function(){4==e.readyState&&200==e.status&&(document.getElementById(\"footer\").style.visibility=\"hidden\")},e.open(\"GET\",window.location.origin+\"/guardar\",!0),e.send(null)}function resetConfig(){var e=new XMLHttpRequest;e.onreadystatechange=function(){4==e.readyState&&200==e.status&&(document.getElementById(\"footer\").style.visibility=\"hidden\",document.location.reload(!0))},e.open(\"GET\",window.location.origin+\"/reset\",!0),e.send(null)}cambiarModo(document.getElementById(\"modo\").value);</script> </html>", _config->getWifiSsid(), _config->getDuracionPulso(), _config->getDuracionIntermedio(), _config->getModoSoldador(), _config->getWifiSsid(), _config->getWifiPassword());
-    }else if(url.equals("/cambiarconfig"))
+      response->addHeader("Cache-Control", "no-cache, must-revalidate");
+      response->addHeader("Pragma", "no-cache");
+
+      response->printf("<!doctype html><html lang=es dir=ltr><meta http-equiv=cache-control content=\"no-cache, no-store, must-revalidate\"><meta http-equiv=pragma content=no-cache><meta http-equiv=expires content=0><meta charset=utf-8><meta name=viewport content=\"width=device-width,initial-scale=1\"><style media=screen>body{padding:0;margin:0;border:0}#loading{position:fixed;top:5px;right:5px}.lds-dual-ring{display:inline-block;width:60px;height:60px}.lds-dual-ring:after{content:\" \";display:block;width:32px;height:32px;margin:8px;border-radius:50%%;border:6px solid #aaa;border-color:#f92e53 #0000 #f92e53 #0000;animation:lds-dual-ring 1.2s linear infinite}@keyframes lds-dual-ring{0%%{transform:rotate(0deg)}100%%{transform:rotate(360deg)}}.config{background-color:#034f84;display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;color:#fff}.config-contenedor{margin:20px;padding-bottom:20px;border-style:dashed;border-radius:10px;width:400px}.config-item{text-align:center}.footer-options{position:fixed;display:flex;width:100%%;max-width:800px;justify-content:center;bottom:0}.footer-button{border:none;color:#fff;padding:15px 32px;width:50%%;text-align:center;text-decoration:none;display:inline-block;font-size:16px}.footer-guardar{background-color:#4caf50}.footer-reset{background-color:#f44336}</style><title>Configurador</title><div id=loading class=lds-dual-ring style=visibility:hidden></div><div id=header class=header><h2 id=title>Configuracion: %s</h2></div><div id=config class=config><div id=config-default class=config-contenedor><div id=config-pulse class=config-item><h2>Tiempo de pulsación</h2><input type=number id=pulse value=%d></div><div id=config-intermediate class=config-item><h2>Tiempo entre pulsaciones</h2><input type=number id=intermediate value=%d></div><div class=config-item><h2>Modo: <span id=config-mode></span></h2><input type=range id=mode min=0 max=2 step=1 value=%d></div></div><div id=config-wifi class=config-contenedor style=visibility:hidden><div class=config-item><h2>SSID</h2><input id=ssid value=%s></div><div class=config-item><h2>Password</h2><input id=password value=%s></div></div><div id=footer class=footer-options style=visibility:hidden><button id=buttonsave class=\"footer-button footer-guardar\" type=button>Guardar</button>\n\
+      <button id=buttonreset class=\"footer-button footer-reset\" type=button>Reset</button></div></div><script>var firstPress=false;function clickDown(e){var configwifi=document.getElementById(\"config-wifi\");if(firstPress===true){if(configwifi.style.visibility==\"hidden\")\n\
+      configwifi.style.visibility=\"visible\";else\n\
+      configwifi.style.visibility=\"hidden\";}else{firstPress=true;window.setTimeout(function(){firstPress=false;},200);}};function changeMode(value){var cdpulso=document.getElementById(\"config-pulse\");var cdintermedio=document.getElementById(\"config-intermediate\")\n\
+      var modo=document.getElementById(\"config-mode\");if(value===\"0\"){cdpulso.style.visibility=\"visible\";cdintermedio.style.visibility=\"hidden\";modo.innerHTML=\"Unico\";}else if(value===\"1\"){cdpulso.style.visibility=\"visible\";cdintermedio.style.visibility=\"visible\";modo.innerHTML=\"Multiple\";}else{cdpulso.style.visibility=\"hidden\";cdintermedio.style.visibility=\"hidden\";modo.innerHTML=\"Continuo\";}}\n\
+      function sendCommand(command,key=null,value=null){var petition=new XMLHttpRequest();petition.onreadystatechange=function(){if(petition.readyState==4&&petition.status==200)\n\
+      loadFinish();}\n\
+      var url=window.location.origin+\"/\"+command;if(key!=null){url+=\"?\"+key+\"=\"+value;}\n\
+      petition.open(\"GET\",url,true);petition.send(null);}\n\
+      function loadFinish()\n\
+      {document.getElementById(\"loading\").style.visibility=\"hidden\";}\n\
+      function loadStart(){document.getElementById(\"loading\").style.visibility=\"visible\";}\n\
+      function onChangedValue(e){var target=e.target;loadStart();sendCommand(\"changeconfig\",target.id,target.value);if(target.id===\"mode\"){changeMode(target.value);}\n\
+      document.getElementById(\"footer\").style.visibility=\"visible\";}\n\
+      function onClickButton(e){var target=e.target;loadStart();if(target.id===\"buttonsave\")\n\
+      {sendCommand(\"save\");}\n\
+      else\n\
+      {sendCommand(\"reset\");location.reload();return false;}\n\
+      document.getElementById(\"footer\").style.visibility=\"hidden\";}\n\
+      document.getElementById(\"config\").addEventListener(\"change\",onChangedValue);document.getElementById(\"config\").addEventListener(\"keyup\",onChangedValue);document.getElementById(\"buttonsave\").addEventListener(\"click\",onClickButton);document.getElementById(\"buttonreset\").addEventListener(\"click\",onClickButton);document.getElementById(\"title\").addEventListener(\"click\",clickDown);changeMode(document.getElementById(\"mode\").value);</script>", _config->getWifiSsid(), _config->getDuracionPulso(), _config->getDuracionIntermedio(), _config->getModoSoldador(), _config->getWifiSsid(), _config->getWifiPassword());
+    }else if(url.equals("/changeconfig"))
     {
       if(request->params() > 0)
       {
@@ -46,14 +68,14 @@ public:
           AsyncWebParameter* p = request->getParam(i);
           String name = p->name();
           String value = p->value();
-          if(name.equals("dpulso"))
+          if(name.equals("pulse"))
           {
             _config->setDuracionPulso(value.toInt());
-            response->print("dpulso=ok,");
-          }else if(name.equals("dintermedio"))
+            response->print("pulse=ok,");
+          }else if(name.equals("intermediate"))
           {
             _config->setDuracionIntermedio(value.toInt());
-            response->print("dintermedio=ok,");
+            response->print("intermediate=ok,");
           }else if(name.equals("ssid"))
           {
             _config->setWifiSsid(value.c_str());
@@ -62,24 +84,24 @@ public:
           {
             _config->setWifiPassword(value.c_str());
             response->print("password=ok,");
-          }else if(name.equals("modo"))
+          }else if(name.equals("mode"))
           {
             switch(value.c_str()[0])
             {
               case '0':
                 _config->setModoSoldador(MODO_SIMPLE);
-                response->print("modo=ok,");
+                response->print("mode=ok,");
               break;
               case '1':
                 _config->setModoSoldador(MODO_MULTIPLE);
-                response->print("modo=ok,");
+                response->print("mode=ok,");
               break;
               case '2':
                 _config->setModoSoldador(MODO_CONTINUO);
-                response->print("modo=ok,");
+                response->print("mode=ok,");
                 break;
               default:
-                response->print("modo=error,");
+                response->print("mode=error,");
             }
           }else
           {
@@ -87,10 +109,10 @@ public:
           }
         }
       }
-    }else if(url.equals("/guardar"))
+    }else if(url.equals("/save"))
     {
       _config->guardarConfiguracion();
-      response->print("guardar=ok,");
+      response->print("save=ok,");
     }else if(url.equals("/reset"))
     {
       _config->cargarConfiguracion();

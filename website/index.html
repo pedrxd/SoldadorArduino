@@ -19,6 +19,10 @@
 <html lang="es" dir="ltr">
 
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style media="screen">
@@ -26,6 +30,40 @@
       padding: 0;
       margin: 0;
       border: 0;
+    }
+
+    #loading {
+      position: fixed;
+      top: 5px;
+      right: 5px;
+    }
+
+    .lds-dual-ring {
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+    }
+
+    .lds-dual-ring:after {
+      content: " ";
+      display: block;
+      width: 32px;
+      height: 32px;
+      margin: 8px;
+      border-radius: 50%;
+      border: 6px solid #aaa;
+      border-color: #F92E53 transparent #F92E53 transparent;
+      animation: lds-dual-ring 1.2s linear infinite;
+    }
+
+    @keyframes lds-dual-ring {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .config {
@@ -53,7 +91,7 @@
       position: fixed;
       display: flex;
       width: 100%;
-      max-width: 600px;
+      max-width: 800px;
       justify-content: center;
       bottom: 0px;
     }
@@ -82,20 +120,23 @@
 </head>
 
 <body>
-  <h2 onmousedown="pulsar_titulo()" onmouseup="despulsar_titulo()">Configuracion: %s</h2>
-  <div class="config">
+  <div id="loading" class="lds-dual-ring" style="visibility: hidden"></div>
+  <div id="header" class="header">
+    <h2 id="title">Configuracion: %s</h2>
+  </div>
+  <div id="config" class="config">
     <div id="config-default" class="config-contenedor">
-      <div id="config-dpulso" class="config-item">
+      <div id="config-pulse" class="config-item">
         <h2>Tiempo de pulsación</h2>
-        <input type="number" id="dpulso" onkeyup="cambiarConfig('dpulso', this.value)" value="%d">
+        <input type="number" id="pulse" value="%d">
       </div>
-      <div id="config-dintermedio" class="config-item">
+      <div id="config-intermediate" class="config-item">
         <h2>Tiempo entre pulsaciones</h2>
-        <input type="number" id="dintermedio" onkeyup="cambiarConfig('dintermedio', this.value)" value="%d">
+        <input type="number" id="intermediate" value="%d">
       </div>
       <div class="config-item">
-        <h2>Modo: <span id="modo-type"></span></h2>
-        <input type="range" id="modo" min="0" max="2" step="1" onchange="cambiarConfig('modo', this.value)" value="%d">
+        <h2>Modo: <span id="config-mode"></span></h2>
+        <input type="range" id="mode" min="0" max="2" step="1" value="%d">
       </div>
     </div>
 
@@ -103,95 +144,127 @@
     <div id="config-wifi" class="config-contenedor" style="visibility: hidden;">
       <div class="config-item">
         <h2>SSID</h2>
-        <input type="text" id="ssid" onkeyup="cambiarConfig('ssid', this.value)" value="%s">
+        <input type="text" id="ssid" value="%s">
       </div>
       <div class="config-item">
         <h2>Password</h2>
-        <input type="text" id="password" onkeyup="cambiarConfig('password', this.value)" value="%s">
+        <input type="text" id="password" value="%s">
       </div>
     </div>
 
     <div id="footer" class="footer-options" style="visibility: hidden;">
-      <button class="footer-button footer-guardar" type="button" onclick="guardarConfig()">Guardar</button>
-      <button class="footer-button footer-reset" type="button" onclick="resetConfig()">Reset</button>
+      <button id="buttonsave" class="footer-button footer-guardar" type="button">Guardar</button>
+      <button id="buttonreset" class="footer-button footer-reset" type="button">Reset</button>
     </div>
   </div>
 </body>
 
 <script>
+  var firstPress = false;
 
-  var pressTimer;
-
-  function pulsar_titulo()
-  {
-    pressTimer = window.setTimeout(function() {
-      if(document.getElementById("config-wifi").style.visibility == "hidden")
-        document.getElementById("config-wifi").style.visibility = "visible";
+  function clickDown(e) {
+    var configwifi = document.getElementById("config-wifi");
+    if (firstPress === true) {
+      if (configwifi.style.visibility == "hidden")
+        configwifi.style.visibility = "visible";
       else
-        document.getElementById("config-wifi").style.visibility = "hidden";
-    },1000);
-  };
-
-  function despulsar_titulo()
-  {
-    clearTimeout(pressTimer);
-  };
-
-
-  function cambiarModo(value) {
-    if (value === "0") {
-      document.getElementById("config-dpulso").style.visibility = "visible";
-      document.getElementById("config-dintermedio").style.visibility = "hidden";
-      document.getElementById("modo-type").innerHTML = "Unico";
-    } else if (value === "1") {
-      document.getElementById("config-dpulso").style.visibility = "visible";
-      document.getElementById("config-dintermedio").style.visibility = "visible";
-      document.getElementById("modo-type").innerHTML = "Multiple";
+        configwifi.style.visibility = "hidden";
     } else {
-      document.getElementById("config-dpulso").style.visibility = "hidden";
-      document.getElementById("config-dintermedio").style.visibility = "hidden";
-      document.getElementById("modo-type").innerHTML = "Continuo";
+      firstPress = true;
+      window.setTimeout(function() {
+        firstPress = false;
+      }, 200);
+    }
+  };
+
+
+  function changeMode(value) {
+    var cdpulso = document.getElementById("config-pulse");
+    var cdintermedio = document.getElementById("config-intermediate")
+    var modo = document.getElementById("config-mode");
+    if (value === "0") {
+      cdpulso.style.visibility = "visible";
+      cdintermedio.style.visibility = "hidden";
+      modo.innerHTML = "Unico";
+    } else if (value === "1") {
+      cdpulso.style.visibility = "visible";
+      cdintermedio.style.visibility = "visible";
+      modo.innerHTML = "Multiple";
+    } else {
+      cdpulso.style.visibility = "hidden";
+      cdintermedio.style.visibility = "hidden";
+      modo.innerHTML = "Continuo";
     }
   }
 
-  function cambiarConfig(key, value) {
-    //Si se cambia modo ocultar o no algunas opciones
-    if (key === "modo") {
-      cambiarModo(value);
-    }
+  function sendCommand(command, key = null, value = null) {
     var petition = new XMLHttpRequest();
     petition.onreadystatechange = function() {
       if (petition.readyState == 4 && petition.status == 200)
-        document.getElementById("footer").style.visibility = "visible";
+        loadFinish();
 
     }
-    petition.open("GET", window.location.origin + "/cambiarconfig?" + key + "=" + value, true); // true for asynchronous
+
+    var url = window.location.origin + "/" + command;
+    if (key != null) {
+      url += "?" + key + "=" + value;
+    }
+    petition.open("GET", url, true); // true for asynchronous
     petition.send(null);
   }
 
-  function guardarConfig() {
-    var petition = new XMLHttpRequest();
-    petition.onreadystatechange = function() {
-      if (petition.readyState == 4 && petition.status == 200)
-        document.getElementById("footer").style.visibility = "hidden";
-    }
-    petition.open("GET", window.location.origin + "/guardar", true); // true for asynchronous
-    petition.send(null);
+  function loadFinish()
+  {
+    document.getElementById("loading").style.visibility = "hidden";
   }
 
-  function resetConfig() {
-    var petition = new XMLHttpRequest();
-    petition.onreadystatechange = function() {
-      if (petition.readyState == 4 && petition.status == 200) {
-        document.getElementById("footer").style.visibility = "hidden";
-        document.location.reload(true);
-      }
-    }
-    petition.open("GET", window.location.origin + "/reset", true); // true for asynchronous
-    petition.send(null);
+  function loadStart() {
+    //ToDo: Que empiece a girar la carga
+    document.getElementById("loading").style.visibility = "visible";
   }
-  
-  cambiarModo(document.getElementById("modo").value);
+
+  function onChangedValue(e) {
+    var target = e.target;
+
+    loadStart();
+    sendCommand("changeconfig", target.id, target.value);
+
+    if (target.id === "mode") {
+      changeMode(target.value);
+    }
+    document.getElementById("footer").style.visibility = "visible";
+  }
+
+  function onClickButton(e) {
+    var target = e.target;
+
+    loadStart();
+    if (target.id === "buttonsave")
+    {
+      sendCommand("save");
+    }
+    else
+    {
+      sendCommand("reset");
+      location.reload();
+      return false;
+    }
+
+    document.getElementById("footer").style.visibility = "hidden";
+  }
+  //Register events
+
+  document.getElementById("config").addEventListener("change", onChangedValue);
+  document.getElementById("config").addEventListener("keyup", onChangedValue);
+
+  document.getElementById("buttonsave").addEventListener("click", onClickButton);
+  document.getElementById("buttonreset").addEventListener("click", onClickButton);
+
+  document.getElementById("title").addEventListener("click", clickDown);
+
+
+  //Update mode visualization
+  changeMode(document.getElementById("mode").value);
 </script>
 
 </html>
