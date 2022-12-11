@@ -44,7 +44,7 @@ Configuracion::Configuracion(const char *mac)
     setDuracionPulso(50);
     setModoSoldador(MODO_SIMPLE);
 
-    setWifiSsid("Solador\0");
+    setWifiSsid("Soldador\0");
     setWifiPassword("soldador1234\0");
 
     guardarConfiguracion();
